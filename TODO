@@ -1,0 +1,5 @@
+Get the race proportions from the voter and housing data for comparison
+Add in DP on housing data
+Add in disparity assessments on housing results
+run the pipeline over both the voter and housing data
+Compare with sex instead of race (or any other variable)
