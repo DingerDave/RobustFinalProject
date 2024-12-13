@@ -13,7 +13,7 @@ nrows = 500000
 voter_data_all = pd.read_csv('./data/combined_nc.csv', nrows=nrows)
 voter_data = data_preprocessing_utils.prep_voter_dataframe(voter_data_all,shuffle=True)
 hold_out = int(len(voter_data)*.9)
-imputation_model = race_imputation_model.RaceImputationModel(["last_name", "tract_code"],["race"])
+imputation_model = race_imputation_model.RaceImputationModel(["tract_code"],["race"])
 start = time.time()
 imputation_model._fit(voter_data[:hold_out])
 print("Time to fit model: ", time.time() - start)
