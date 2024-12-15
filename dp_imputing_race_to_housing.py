@@ -45,7 +45,7 @@ def test_different_epsilons_and_thresholds(voter_data, housing_data, input_cols,
 
 input_cols = ["tract_code"]
 target_cols = ["race"]
-epsilon_values = [0.1, 0.5, 1.0, 2.0]
-thresholds = [0.25, 0.5, 0.75, 0.95]
+epsilon_values = [1., 7.5]
+thresholds = []
 
 test_different_epsilons_and_thresholds(voter_data, housing_data, input_cols, target_cols, epsilon_values, thresholds)

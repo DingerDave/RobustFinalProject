@@ -38,8 +38,9 @@ class DifferentialPrivacyRaceImputationModel(RaceImputationModel):
         Returns:
             float: The value with added noise, ensuring non-negativity.
         """
-        noise = np.random.laplace(0, 1/value * self.epsilon)  # scale is 1/value*epsilon
-        return max(0, noise)  # ensure non-negative counts
+        noise = np.random.laplace(0, 1/(value * self.epsilon)) # scale is 1/value*epsilon
+        print(noise)
+        return noise  # ensure non-negative counts
 
     def _compute_conditional_probabilities(self):
         """
@@ -51,17 +52,19 @@ class DifferentialPrivacyRaceImputationModel(RaceImputationModel):
         self.conditional_probs = copy.deepcopy(self.posterior_counts)
 
         # compute joint probabilities with noise
-        for key, val in self.posterior_counts.items():
-            noisy_count = self.add_laplace_noise(val)  # add noise to counts
-            self.joint_prob_counts[tuple(key[col] for col in input_cols)] += noisy_count
+        # for key, val in self.posterior_counts.items():
+        #     noisy_count = self.add_laplace_noise(val)  # add noise to counts
+        #     self.joint_prob_counts[tuple(key[col] for col in input_cols)] += noisy_count
 
         # compute conditional probabilities with noisy counts
         for key, val in self.posterior_counts.items():
             joint_count = self.joint_prob_counts[tuple(key[col] for col in input_cols)]
             
             if joint_count == 0:
+                #print("joint_coutn 0")
                 self.conditional_probs[key] = 0  # set to zero or some default value
             else:
+                print("Not counts 0")
                 self.conditional_probs[key] = self.add_laplace_noise(val / joint_count)
                 self.conditional_probs[key] = max(self.conditional_probs[key], 0)
 
@@ -77,7 +80,7 @@ class DifferentialPrivacyRaceImputationModel(RaceImputationModel):
             data (Union[pd.DataFrame, np.ndarray, dict]): Input data.
         """
         super()._fit(data)  # call the original fit method
-        self._compute_conditional_probabilities()  # compute conditional probabilities with DP
+        #self._compute_conditional_probabilities()  # compute conditional probabilities with DP
 
     def predict(self, data: Union[pd.DataFrame, np.ndarray, dict], sampling_method=None, threshold=None):
         """
