@@ -36,22 +36,3 @@ housing_data["pred_ri_threshold_95"] = predicted_data_threshold_95[:,1]
 
 print("Time to predict: ", time.time() - start)
 housing_data.to_csv('./data/hmda_nc_ri.csv', index=False)
-# # get the percentage of predictions that are "Null"
-
-# print("Percentage of predictions that are 'Null' argmax: ", np.sum(predicted_data_argmax[:,1] == "Null")/len(predicted_data_argmax))
-# print("Percentage that are not Null and correct", np.sum((predicted_data_argmax[:,1] != "Null") & (predicted_data_argmax[:,1] == voter_data.to_numpy()[hold_out:, 3]))/len(predicted_data_argmax))
-
-# print("Percentage of predictions that are 'Null' sample: ", np.sum(predicted_data_sample[:,1] == "Null")/len(predicted_data_sample))
-# print("Percentage that are not Null and correct", np.sum((predicted_data_sample[:,1] != "Null") & (predicted_data_sample[:,1] == voter_data.to_numpy()[hold_out:, 3]))/len(predicted_data_sample))
-
-# print("Percentage of predictions that are 'Null' threshold 25: ", np.sum(predicted_data_threshold_25[:,1] == "Null")/len(predicted_data_threshold_25))
-# print("Percentage that are not Null and correct", np.sum((predicted_data_threshold_25[:,1] != "Null") & (predicted_data_threshold_25[:,1] == voter_data.to_numpy()[hold_out:, 3]))/len(predicted_data_threshold_25))
-
-# print("Percentage of predictions that are 'Null' threshold 5: ", np.sum(predicted_data_threshold_5[:,1] == "Null")/len(predicted_data_threshold_5))
-# print("Percentage that are not Null and correct", np.sum((predicted_data_threshold_5[:,1] != "Null") & (predicted_data_threshold_5[:,1] == voter_data.to_numpy()[hold_out:, 3]))/len(predicted_data_threshold_5))
-
-# print("Percentage of predictions that are 'Null' threshold 75: ", np.sum(predicted_data_threshold_75[:,1] == "Null")/len(predicted_data_threshold_75))
-# print("Percentage that are not Null and correct", np.sum((predicted_data_threshold_75[:,1] != "Null") & (predicted_data_threshold_75[:,1] == voter_data.to_numpy()[hold_out:, 3]))/len(predicted_data_threshold_75))
-
-# print("Percentage of predictions that are 'Null' threshold 95: ", np.sum(predicted_data_threshold_95[:,1] == "Null")/len(predicted_data_threshold_95))
-# print("Percentage that are not Null and correct", np.sum((predicted_data_threshold_95[:,1] != "Null") & (predicted_data_threshold_95[:,1] == voter_data.to_numpy()[hold_out:, 3]))/len(predicted_data_threshold_95))

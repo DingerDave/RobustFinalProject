@@ -1,23 +1,20 @@
 import numpy as np
 import pandas as pd
 
-def demographic_parity(demographic_cols: list[str], predictions: np.ndarray, protected_attributes: pd.DataFrame) -> float:
+def demographic_parity(ri_model, demographic_col: str, prediction_col: str) -> float:
     """
     Calculate the demographic parity of a model's predictions.
 
     Args:
         demographic_cols (list[str]): The demographic columns to consider.
         predictions (np.ndarray): The model's predictions.
-        protected_attributes (pd.DataFrame): The protected attributes.
+        
 
     Returns:
         float: The demographic parity.
     """
-    demographic_parity = 0
-    for col in demographic_cols:
-        demographic_parity += np.abs(predictions - protected_attributes[col].values).mean()
-    return demographic_parity / len(demographic_cols)
-
+    ri_model.conditional_probs
+        
 def equal_opportunity(demographic_cols: list[str], predictions: np.ndarray, protected_attributes: pd.DataFrame, true_labels: np.ndarray) -> float:
     """
     Calculate the equal opportunity of a model's predictions.

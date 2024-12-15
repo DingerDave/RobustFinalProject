@@ -151,3 +151,26 @@ class RaceImputationModel():
                 else:
                     raise ValueError("Invalid sampling method. Options are 'argmax', 'threshold', or 'sample'")
         return data
+
+
+    def demographic_parity(self) -> float:
+        """
+        Calculate the demographic parity of a model's predictions.
+   
+        Returns:
+            float: The demographic parity.
+        """
+        if self.conditional_probs is None:
+            raise ValueError("Model must be fit before calculating fairness metrics")
+        
+        # get the highest probability based on the conditional probabilities
+        conds = list(self.conditional_probs.items())
+        # get only the first class
+        first_class = conds[0][0][1]
+        conds = [cond for cond in conds if cond[0][1] == first_class]
+        probs = {cond[0][0]: cond[1] for cond in conds}
+        max_prob = max(probs.values())
+        disparity = {col: prob/max_prob for col, prob in probs.items()}
+        
+        return disparity
+
