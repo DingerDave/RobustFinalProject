@@ -14,6 +14,7 @@ def prep_voter_dataframe(voter_data: pd.DataFrame, drop_null: bool = True, shuff
         pd.DataFrame: The processed voter dataframe.
     """
     voter_data = voter_data[['last_name', 'first_name', 'middle_name', 'race', 'tract_code']]
+    voter_data.loc[voter_data["race"]=="aian", "race"] = "asian"
     voter_data = voter_data.dropna() if drop_null else voter_data
     voter_data["tract_code"] = voter_data["tract_code"].astype(int).astype(str)
     voter_data["tract_code"] = voter_data["tract_code"].str.zfill(6)
@@ -34,10 +35,17 @@ def prep_housing_dataframe(housing_data: pd.DataFrame, drop_null: bool=True, shu
     Returns:
         pd.DataFrame: The processed voter dataframe.
     """
-    housing_data = housing_data[['census_tract', 'derived_race', 'derived_sex', 'denial_reason-1']]
+    housing_data = housing_data[['derived_race', 'census_tract', 'derived_sex', 'denial_reason-1']]
+    housing_data.rename(columns={'derived_race': 'race', "census_tract":"tract_code"}, inplace=True)
     housing_data = housing_data.dropna() if drop_null else housing_data
-    housing_data["census_tract"] = housing_data["census_tract"].astype(int).astype(str)
-    housing_data["census_tract"] = housing_data["census_tract"].str.zfill(6)
+    housing_data.loc[housing_data["race"]=="White", "race"] = "white"
+    housing_data.loc[housing_data["race"]=="Black or African American", "race"] = "black"
+    housing_data.loc[housing_data["race"] == "Asian", "race"] = "asian"
+    housing_data.loc[housing_data["race"] == "Free Form Text Only", "race"] = "other"
+    # Extract the last 6 digits of the tract code
+    housing_data["tract_code"] = housing_data["tract_code"].astype(int).astype(str).apply(lambda x: x[-6:])
+    housing_data["tract_code"] = housing_data["tract_code"].str.zfill(6)
+    housing_data["denied"] = housing_data["denial_reason-1"].apply(lambda x: 0 if x == 10 else 1)
     if shuffle:
         housing_data = housing_data.sample(frac=1).reset_index(drop=True)
     return housing_data

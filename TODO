@@ -1,4 +1,5 @@
 Get the race proportions from the voter and housing data for comparison
+Create new, clean dataframe with race imputated with various methods
 Add in DP on housing data
 Add in disparity assessments on housing results
 run the pipeline over both the voter and housing data
