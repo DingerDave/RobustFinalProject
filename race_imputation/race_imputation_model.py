@@ -147,6 +147,9 @@ class RaceImputationModel():
                     else:
                         row[self.name_to_col_map[target_col]] = self.unique_vals[self.name_to_col_map[target_col]][np.argmax(conditional_probs)]
                 elif sampling_method == "sample":
+                    conditional_probs = conditional_probs / np.sum(conditional_probs)  # normalize probs
+                    conditional_probs = np.nan_to_num(conditional_probs)  # replace nans
+                    conditional_probs /= np.sum(conditional_probs)  # renormalize
                     row[self.name_to_col_map[target_col]] = np.random.choice(self.unique_vals[self.name_to_col_map[target_col]], p=conditional_probs)
                 else:
                     raise ValueError("Invalid sampling method. Options are 'argmax', 'threshold', or 'sample'")
