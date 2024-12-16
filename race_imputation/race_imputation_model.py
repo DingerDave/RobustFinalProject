@@ -11,7 +11,7 @@ class RaceImputationModel():
     derived from input columns.
     """
 
-    def __init__(self, input_cols, target_cols):
+    def __init__(self, input_cols, target_cols, apply_dp=False):
         """
         Initialize the RaceImputationModel with input and target columns.
 
@@ -21,6 +21,7 @@ class RaceImputationModel():
         """
         self.input_cols = input_cols
         self.target_cols = target_cols
+        self.apply_dp = apply_dp
         self.interest_cols = input_cols + target_cols
         self.col_to_name_map = {col: self.interest_cols[col] for col in range(len(self.interest_cols))}
         self.name_to_col_map = {self.interest_cols[col]: col for col in range(len(self.interest_cols))}
@@ -68,7 +69,7 @@ class RaceImputationModel():
         input_cols = [self.name_to_col_map[col] for col in self.input_cols]
         self.joint_prob_counts = defaultdict(lambda: 0)
         self.conditional_probs = copy.deepcopy(self.posterior_counts)
-
+    
         # Compute joint probabilities
         for key, val in self.posterior_counts.items():
             self.joint_prob_counts[tuple(key[col] for col in input_cols)] += val

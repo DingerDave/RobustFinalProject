@@ -38,7 +38,7 @@ class DifferentialPrivacyRaceImputationModel(RaceImputationModel):
         Returns:
             float: The value with added noise, ensuring non-negativity.
         """
-        noise = np.random.laplace(0, 1/(value * self.epsilon)) # scale is 1/value*epsilon
+        noise = np.random.laplace(0, value/self.epsilon) # scale is 1/value*epsilon
         print(noise)
         return noise  # ensure non-negative counts
 
@@ -50,27 +50,16 @@ class DifferentialPrivacyRaceImputationModel(RaceImputationModel):
         input_cols = [self.name_to_col_map[col] for col in self.input_cols]
         self.joint_prob_counts = defaultdict(lambda: 0)
         self.conditional_probs = copy.deepcopy(self.posterior_counts)
-
-        # compute joint probabilities with noise
-        # for key, val in self.posterior_counts.items():
-        #     noisy_count = self.add_laplace_noise(val)  # add noise to counts
-        #     self.joint_prob_counts[tuple(key[col] for col in input_cols)] += noisy_count
-
-        # compute conditional probabilities with noisy counts
+    
+        # Compute joint probabilities
         for key, val in self.posterior_counts.items():
-            joint_count = self.joint_prob_counts[tuple(key[col] for col in input_cols)]
-            
-            if joint_count == 0:
-                #print("joint_coutn 0")
-                self.conditional_probs[key] = 0  # set to zero or some default value
-            else:
-                print("Not counts 0")
-                self.conditional_probs[key] = self.add_laplace_noise(val / joint_count)
-                self.conditional_probs[key] = max(self.conditional_probs[key], 0)
+            self.joint_prob_counts[tuple(key[col] for col in input_cols)] += val
 
-                # conditional_probs = conditional_probs / np.sum(conditional_probs)  # Normalize probabilities
-                # conditional_probs = np.nan_to_num(conditional_probs)  # Replace NaNs with 0
-                # conditional_probs /= np.sum(conditional_probs)  # Re-normalize after replacing NaNs
+        # Compute conditional probabilities
+        for key, val in self.posterior_counts.items():
+            self.conditional_probs[key] /= self.joint_prob_counts[tuple(key[col] for col in input_cols)]
+            self.conditional_probs[key] += self.add_laplace_noise(1/self.joint_prob_counts[tuple(key[col] for col in input_cols)])
+            self.conditional_probs[key] = max(0, self.conditional_probs[key])  # ensure non-negative probabilities
 
     def fit(self, data: Union[pd.DataFrame, np.ndarray, dict]):
         """
