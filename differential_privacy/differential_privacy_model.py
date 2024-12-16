@@ -39,7 +39,7 @@ class DifferentialPrivacyRaceImputationModel(RaceImputationModel):
             float: The value with added noise, ensuring non-negativity.
         """
         noise = np.random.laplace(0, value/self.epsilon) # scale is 1/value*epsilon
-        print(noise)
+        # print(noise)
         return noise  # ensure non-negative counts
 
     def _compute_conditional_probabilities(self):
@@ -61,7 +61,7 @@ class DifferentialPrivacyRaceImputationModel(RaceImputationModel):
             self.conditional_probs[key] += self.add_laplace_noise(1/self.joint_prob_counts[tuple(key[col] for col in input_cols)])
             self.conditional_probs[key] = max(0, self.conditional_probs[key])  # ensure non-negative probabilities
 
-    def fit(self, data: Union[pd.DataFrame, np.ndarray, dict]):
+    def _fit(self, data: Union[pd.DataFrame, np.ndarray, dict]):
         """
         Fit the model to the data by computing counts and probabilities with differential privacy.
 
@@ -71,7 +71,7 @@ class DifferentialPrivacyRaceImputationModel(RaceImputationModel):
         super()._fit(data)  # call the original fit method
         #self._compute_conditional_probabilities()  # compute conditional probabilities with DP
 
-    def predict(self, data: Union[pd.DataFrame, np.ndarray, dict], sampling_method=None, threshold=None):
+    def _predict(self, data: Union[pd.DataFrame, np.ndarray, dict], sampling_method=None, threshold=None):
         """
         Predict the target columns for the input data, using the DP conditional probabilities.
 
