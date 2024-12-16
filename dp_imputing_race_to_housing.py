@@ -45,7 +45,20 @@ def test_different_epsilons_and_thresholds(voter_data, housing_data, input_cols,
 
 input_cols = ["tract_code"]
 target_cols = ["race"]
+<<<<<<< Updated upstream
 epsilon_values = [.05, .01]
 thresholds = []
+=======
+epsilon_values = [0.01, 0.02, 0.05, 0.1]
+thresholds = [0.25, 0.75, 0.95]
+>>>>>>> Stashed changes
 
 test_different_epsilons_and_thresholds(voter_data, housing_data, input_cols, target_cols, epsilon_values, thresholds)
+
+'''
+error due to privacy < error due to race imputation
+add privacy at individual level 
+change epsilon values (0 - 1)
+see how the accuracy of imputation changes
+see how the test results change
+'''
