@@ -175,6 +175,8 @@ class RaceImputationModel():
         probs = {cond[0][0]: cond[1] for cond in conds}
         max_prob = max(probs.values())
         col_to_race = {value: key for key, value in self.val_to_idx[0].items()}
+        if "Null" in col_to_race:
+            del col_to_race['Null']
         # print(probs.items())
         disparity = {col_to_race[col]: prob/max_prob for col, prob in probs.items()}
         

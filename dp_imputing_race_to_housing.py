@@ -19,6 +19,8 @@ def test_different_epsilons_and_thresholds(voter_data, housing_data, input_cols,
     accuracies_by_race = {}
     parities = {}
 
+    threshold = 0.5
+
     for epsilon in epsilon_values:
         # use current epsilon
         if epsilon != 0:
@@ -33,17 +35,18 @@ def test_different_epsilons_and_thresholds(voter_data, housing_data, input_cols,
 
         # predict on housing w argmax
         start = time.time()
-        predicted_argmax = dp_imputation_model._predict(housing_data, sampling_method="argmax")
+        predicted_argmax = dp_imputation_model.predict(housing_data, sampling_method="argmax")
         print(f"Time to predict argmax with epsilon {epsilon}: ", time.time() - start)
         housing_data[f"pred_ri_argmax_epsilon_{epsilon}"] = predicted_argmax[:, 1]
 
         # predict on housing w sampling
-        predicted_data_sample = dp_imputation_model._predict(housing_data, sampling_method="sample")
-        housing_data[f"pred_ri_sample_epsilon_{epsilon}"] = predicted_data_sample[:, 1]
+        predicted_data_sample = dp_imputation_model.predict(housing_data, sampling_method="sample")
+        housing_data[f"pred_ri_threshold_{threshold}_epsilon_{epsilon}"] = predicted_data_sample[:, 1]
 
         dp_housing_data_imputation_comp = housing_data[housing_data["race"] != "Race Not Available"]
+        dp_housing_data_imputation_comp = dp_housing_data_imputation_comp [dp_housing_data_imputation_comp [f"pred_ri_threshold_{threshold}_epsilon_{epsilon}"] != "Null"]
         print(housing_data['race'].unique())
-        print(housing_data[f"pred_ri_sample_epsilon_{epsilon}"].unique())
+        print(housing_data[f"pred_ri_threshold_{threshold}_epsilon_{epsilon}"].unique())
         # accuracy_argmax = sum(dp_housing_data_imputation_comp[f"pred_ri_argmax_epsilon_{epsilon}"] == dp_housing_data_imputation_comp["race"]) / len(dp_housing_data_imputation_comp)
         # accuracy_sample = sum(dp_housing_data_imputation_comp[f"pred_ri_sample_epsilon_{epsilon}"] == dp_housing_data_imputation_comp["race"]) / len(dp_housing_data_imputation_comp)
 
@@ -71,20 +74,22 @@ def test_different_epsilons_and_thresholds(voter_data, housing_data, input_cols,
         #     else:
         #         accuracies[key].append(accuracy_threshold)
 
-        # race_accuracies = fairness_metrics.accuracy_by_race(dp_housing_data_imputation_comp,
-        #                                  f"pred_ri_argmax_epsilon_{epsilon}",
-        #                                  "race",
-        #                                  "race")
         
-        # # Initialize or append accuracies by race
-        # if len(accuracies_by_race) == 0:
-        #     accuracies_by_race = {race: [acc] for race, acc in race_accuracies.items()}
-        # else:
-        #     for race in race_accuracies:
-        #         accuracies_by_race[race].append(race_accuracies[race])
+
+        race_accuracies = fairness_metrics.accuracy_by_race(dp_housing_data_imputation_comp,
+                                         f"pred_ri_threshold_{threshold}_epsilon_{epsilon}",
+                                         "race",
+                                         "race")
+        
+        # Initialize or append accuracies by race
+        if len(accuracies_by_race) == 0:
+            accuracies_by_race = {race: [acc] for race, acc in race_accuracies.items()}
+        else:
+            for race in race_accuracies:
+                accuracies_by_race[race].append(race_accuracies[race])
        
-        model = RaceImputationModel([f"pred_ri_argmax_epsilon_{epsilon}"], ["denied"])
-        model._fit(dp_housing_data_imputation_comp)
+        model = DifferentialPrivacyRaceImputationModel([f"pred_ri_threshold_{threshold}_epsilon_{epsilon}"], ["denied"])
+        model.fit(dp_housing_data_imputation_comp)
         
         # Track parities
         parity = model.demographic_parity()
@@ -95,8 +100,9 @@ def test_different_epsilons_and_thresholds(voter_data, housing_data, input_cols,
             for key in parities:
                 parities[key].append(parity.get(key, None))
 
-    # print(accuracies)
+    print(accuracies_by_race)
 
+    print("/nparities/n")
     print(parities)
 
     # return accuracies, parities
@@ -117,8 +123,8 @@ def test_different_epsilons_and_thresholds(voter_data, housing_data, input_cols,
 input_cols = ["tract_code"]
 target_cols = ["race"]
 # epsilon_values = np.arange(0.001, 0.01, 0.001)
-epsilon_values = [1]
-# epsilon_values = range(1, 10, 1)
+# epsilon_values = [1, 2, 3, 4]
+epsilon_values = range(1, 10, 1)
 thresholds = []
 
 test_different_epsilons_and_thresholds(voter_data, housing_data, input_cols, target_cols, epsilon_values, thresholds)
